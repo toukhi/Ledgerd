@@ -1,0 +1,330 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAccount } from 'wagmi';
+import { WalletGuard } from '@/components/WalletGuard';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CertificateCategory, CertificateMeta } from '@/types/certificate';
+import { issueMockCertificate } from '@/lib/mockChain';
+import { useAppStore } from '@/store/useAppStore';
+import { toast } from 'sonner';
+import { ArrowLeft, Send } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { isAddress } from 'viem';
+
+const categories: CertificateCategory[] = ['Internship', 'Hackathon', 'Course', 'Volunteering', 'Other'];
+
+export default function IssueCertificate() {
+  const navigate = useNavigate();
+  const { address } = useAccount();
+  const addCertificate = useAppStore((state) => state.addCertificate);
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    recipient: '',
+    title: '',
+    description: '',
+    issuerName: '',
+    category: '' as CertificateCategory,
+    skills: '',
+    evidenceUrls: '',
+    startDate: '',
+    endDate: '',
+    imageUrl: '',
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.recipient || !isAddress(formData.recipient)) {
+      newErrors.recipient = 'Valid recipient address required';
+    }
+
+    if (formData.title.length < 3 || formData.title.length > 80) {
+      newErrors.title = 'Title must be 3-80 characters';
+    }
+
+    if (formData.description.length < 20 || formData.description.length > 1000) {
+      newErrors.description = 'Description must be 20-1000 characters';
+    }
+
+    if (!formData.issuerName) {
+      newErrors.issuerName = 'Issuer name is required';
+    }
+
+    if (formData.evidenceUrls) {
+      const urls = formData.evidenceUrls.split(',').map(u => u.trim());
+      const invalidUrls = urls.filter(url => url && !url.startsWith('https://'));
+      if (invalidUrls.length > 0) {
+        newErrors.evidenceUrls = 'Evidence URLs must be valid https:// URLs';
+      }
+    }
+
+    if (formData.startDate && formData.endDate) {
+      if (new Date(formData.startDate) > new Date(formData.endDate)) {
+        newErrors.endDate = 'End date must be after start date';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm() || !address) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const meta: CertificateMeta = {
+        title: formData.title,
+        description: formData.description,
+        issuerName: formData.issuerName,
+        category: formData.category || undefined,
+        skills: formData.skills ? formData.skills.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        evidenceUrls: formData.evidenceUrls ? formData.evidenceUrls.split(',').map(u => u.trim()).filter(Boolean) : undefined,
+        startDate: formData.startDate || undefined,
+        endDate: formData.endDate || undefined,
+        image: formData.imageUrl || undefined,
+      };
+
+      const newCert = issueMockCertificate({
+        issuer: address,
+        recipient: formData.recipient as `0x${string}`,
+        status: 'PENDING',
+        tokenURI: 'ipfs://TODO',
+        meta,
+      });
+
+      addCertificate(newCert);
+      
+      toast.success('Certificate issued successfully!', {
+        description: 'Recipient will be notified to accept or decline.',
+      });
+
+      navigate('/');
+    } catch (error) {
+      toast.error('Failed to issue certificate');
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const updateField = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  return (
+    <WalletGuard>
+      <div className="min-h-screen gradient-mesh">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <Link to="/">
+            <Button variant="ghost" className="mb-6 gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+          </Link>
+
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Issue Certificate
+            </h1>
+            <p className="text-muted-foreground">
+              Create a new on-chain certificate for a recipient
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Form */}
+            <Card className="glass-card p-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="recipient">Recipient Address *</Label>
+                  <Input
+                    id="recipient"
+                    placeholder="0x..."
+                    value={formData.recipient}
+                    onChange={(e) => updateField('recipient', e.target.value)}
+                    className={errors.recipient ? 'border-destructive' : ''}
+                  />
+                  {errors.recipient && (
+                    <p className="text-sm text-destructive">{errors.recipient}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="title">Certificate Title *</Label>
+                  <Input
+                    id="title"
+                    placeholder="e.g., Hackathon Participant"
+                    value={formData.title}
+                    onChange={(e) => updateField('title', e.target.value)}
+                    className={errors.title ? 'border-destructive' : ''}
+                  />
+                  {errors.title && (
+                    <p className="text-sm text-destructive">{errors.title}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="issuerName">Organization / Issuer Name *</Label>
+                  <Input
+                    id="issuerName"
+                    placeholder="e.g., START Hack"
+                    value={formData.issuerName}
+                    onChange={(e) => updateField('issuerName', e.target.value)}
+                    className={errors.issuerName ? 'border-destructive' : ''}
+                  />
+                  {errors.issuerName && (
+                    <p className="text-sm text-destructive">{errors.issuerName}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description *</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Describe what the recipient accomplished..."
+                    value={formData.description}
+                    onChange={(e) => updateField('description', e.target.value)}
+                    className={errors.description ? 'border-destructive' : ''}
+                    rows={4}
+                  />
+                  {errors.description && (
+                    <p className="text-sm text-destructive">{errors.description}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <Select value={formData.category} onValueChange={(value) => updateField('category', value)}>
+                    <SelectTrigger id="category">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="startDate">Start Date</Label>
+                    <Input
+                      id="startDate"
+                      type="date"
+                      value={formData.startDate}
+                      onChange={(e) => updateField('startDate', e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="endDate">End Date</Label>
+                    <Input
+                      id="endDate"
+                      type="date"
+                      value={formData.endDate}
+                      onChange={(e) => updateField('endDate', e.target.value)}
+                      className={errors.endDate ? 'border-destructive' : ''}
+                    />
+                    {errors.endDate && (
+                      <p className="text-sm text-destructive">{errors.endDate}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="skills">Skills (comma-separated)</Label>
+                  <Input
+                    id="skills"
+                    placeholder="e.g., Solidity, React, Web3"
+                    value={formData.skills}
+                    onChange={(e) => updateField('skills', e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="evidenceUrls">Evidence URLs (comma-separated)</Label>
+                  <Input
+                    id="evidenceUrls"
+                    placeholder="e.g., https://github.com/project"
+                    value={formData.evidenceUrls}
+                    onChange={(e) => updateField('evidenceUrls', e.target.value)}
+                    className={errors.evidenceUrls ? 'border-destructive' : ''}
+                  />
+                  {errors.evidenceUrls && (
+                    <p className="text-sm text-destructive">{errors.evidenceUrls}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="imageUrl">Certificate Image URL</Label>
+                  <Input
+                    id="imageUrl"
+                    placeholder="https://..."
+                    value={formData.imageUrl}
+                    onChange={(e) => updateField('imageUrl', e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Leave empty for auto-generated certificate
+                  </p>
+                </div>
+
+                <Button type="submit" disabled={isSubmitting} className="w-full gap-2">
+                  <Send className="h-4 w-4" />
+                  {isSubmitting ? 'Issuing...' : 'Issue Certificate'}
+                </Button>
+              </form>
+            </Card>
+
+            {/* Preview */}
+            <Card className="glass-card p-6 h-fit sticky top-24">
+              <h3 className="font-semibold mb-4">Preview</h3>
+              <div className="space-y-4">
+                {formData.imageUrl && (
+                  <img 
+                    src={formData.imageUrl} 
+                    alt="Certificate preview"
+                    className="w-full rounded-lg"
+                  />
+                )}
+                <div>
+                  <h4 className="font-semibold text-lg">{formData.title || 'Certificate Title'}</h4>
+                  <p className="text-sm text-muted-foreground">{formData.issuerName || 'Issuer Name'}</p>
+                </div>
+                {formData.description && (
+                  <p className="text-sm line-clamp-3">{formData.description}</p>
+                )}
+                {formData.skills && (
+                  <div className="flex flex-wrap gap-1">
+                    {formData.skills.split(',').map((skill, i) => (
+                      <span key={i} className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
+                        {skill.trim()}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </WalletGuard>
+  );
+}
