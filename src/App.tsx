@@ -12,36 +12,43 @@ import Home from "./pages/Home";
 import CertificateDetail from "./pages/CertificateDetail";
 import IssueCertificate from "./pages/IssueCertificate";
 import NotFound from "./pages/NotFound";
+import { sdk } from '@farcaster/miniapp-sdk';
+import { useEffect } from 'react';
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <WagmiProvider config={config}>
-    <QueryClientProvider client={queryClient}>
-      <RainbowKitProvider theme={darkTheme({
-        accentColor: 'hsl(220, 90%, 56%)',
-        accentColorForeground: 'white',
-        borderRadius: 'medium',
-      })}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <div className="min-h-screen flex flex-col">
-              <Navigation />
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/cert/:id" element={<CertificateDetail />} />
-                <Route path="/issue" element={<IssueCertificate />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          </BrowserRouter>
-        </TooltipProvider>
-      </RainbowKitProvider>
-    </QueryClientProvider>
-  </WagmiProvider>
-);
+function App() {
+    useEffect(() => {
+        sdk.actions.ready();
+    }, []);
+    return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider theme={darkTheme({
+          accentColor: 'hsl(220, 90%, 56%)',
+          accentColorForeground: 'white',
+          borderRadius: 'medium',
+        })}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <div className="min-h-screen flex flex-col">
+                <Navigation />
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/cert/:id" element={<CertificateDetail />} />
+                  <Route path="/issue" element={<IssueCertificate />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+            </BrowserRouter>
+          </TooltipProvider>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
+}
 
 export default App;
