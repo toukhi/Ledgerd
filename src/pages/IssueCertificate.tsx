@@ -154,7 +154,10 @@ export default function IssueCertificate() {
       <div className="min-h-screen gradient-mesh">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <Link to="/">
-            <Button variant="ghost" className="mb-6 gap-2">
+            <Button
+              variant="ghost"
+              className="mb-6 gap-2 hover:bg-[#c7395c] hover:text-white"
+            >
               <ArrowLeft className="h-4 w-4" />
               Back
             </Button>
