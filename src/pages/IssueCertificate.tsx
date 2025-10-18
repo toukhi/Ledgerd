@@ -16,6 +16,14 @@ import { ArrowLeft, Send, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { isAddress } from 'viem';
 
+// Add these mock collections at the top (replace with real data as needed)
+// TODO REPLACE WITH REAL USER COLLECTIONS
+const userCollections = [
+  { id: 'col1', name: 'Hackathons' },
+  { id: 'col2', name: 'Courses' },
+  { id: 'col3', name: 'Volunteering' },
+];
+
 const categories: CertificateCategory[] = ['Internship', 'Hackathon', 'Course', 'Volunteering', 'Other'];
 
 export default function IssueCertificate() {
@@ -40,6 +48,9 @@ export default function IssueCertificate() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [selectedCollection, setSelectedCollection] = useState<string>(userCollections[0]?.id || '');
+  const [isCreatingCollection, setIsCreatingCollection] = useState(false);
+  const [newCollectionName, setNewCollectionName] = useState('');
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -150,7 +161,7 @@ export default function IssueCertificate() {
           </Link>
 
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[#c7395c] to-[#c7395c] bg-clip-text text-transparent">
               Issue Certificate
             </h1>
             <p className="text-muted-foreground">
@@ -162,6 +173,42 @@ export default function IssueCertificate() {
             {/* Form */}
             <Card className="glass-card p-6">
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Collection dropdown */}
+                <div className="space-y-2">
+                  <Label htmlFor="collection">Collection</Label>
+                  <Select
+                    value={selectedCollection}
+                    onValueChange={(value) => {
+                      setSelectedCollection(value);
+                      setIsCreatingCollection(value === 'create_new');
+                    }}
+                  >
+                    <SelectTrigger id="collection">
+                      <SelectValue placeholder="Select a collection" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {userCollections.map((col) => (
+                        <SelectItem key={col.id} value={col.id}>
+                          {col.name}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="create_new">Create new collection</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {isCreatingCollection && (
+                    <div className="mt-2">
+                      <Label htmlFor="newCollectionName">New Collection Name</Label>
+                      <Input
+                        id="newCollectionName"
+                        placeholder="Enter collection name"
+                        value={newCollectionName}
+                        onChange={(e) => setNewCollectionName(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                  )}
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="attachments">Attachments (optional)</Label>
                   <p className="text-xs text-muted-foreground">Upload any supporting files as PDF (handbook, brochure, etc.).</p>
