@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Shield, AlertCircle } from 'lucide-react';
 import { base, baseSepolia } from 'wagmi/chains';
+import logoSmall from "../../public/logo-small.png";
 import { useSwitchChain } from 'wagmi';
+import { BubbleBackground } from "@/components/animate-ui/components/backgrounds/bubble";
 
 const SUPPORTED_CHAINS = [8453, 84532] as const;
 
@@ -19,24 +21,28 @@ export function WalletGuard({ children }: WalletGuardProps) {
 
   if (!isConnected) {
     return (
+      <BubbleBackground color="#c7395c" >
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center gradient-mesh">
         <Card className="max-w-md w-full p-8 glass-card text-center space-y-6">
-          <div className="h-20 w-20 rounded-full bg-gradient-primary mx-auto flex items-center justify-center">
-            <Shield className="h-10 w-10 text-white" />
+          <div className="flex items-center justify-center">
+            <img src={logoSmall} alt="Logo" className="h-20 w-20 rounded-lg" />
           </div>
           
           <div>
-            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Welcome to Proofs
+            
+            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-[#c7395c] to-[#a9667e] bg-clip-text text-transparent">
+              Welcome to Ledgerd
             </h1>
             <p className="text-muted-foreground">
               Connect your wallet to view and manage your on-chain certificates
             </p>
           </div>
 
+
           <div className="flex justify-center">
             <ConnectButton />
           </div>
+
 
           <div className="pt-4 border-t border-border/50">
             <p className="text-xs text-muted-foreground">
@@ -45,6 +51,7 @@ export function WalletGuard({ children }: WalletGuardProps) {
           </div>
         </Card>
       </div>
+      </BubbleBackground>
     );
   }
 

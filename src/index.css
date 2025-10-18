@@ -48,10 +48,10 @@ All colors MUST be HSL.
     --gradient-mesh: radial-gradient(at 0% 0%, hsl(220 90% 56% / 0.15) 0px, transparent 50%),
                      radial-gradient(at 100% 0%, hsl(267 84% 65% / 0.15) 0px, transparent 50%),
                      radial-gradient(at 100% 100%, hsl(158 64% 52% / 0.1) 0px, transparent 50%);
-    
+
     --shadow-glass: 0 8px 32px 0 hsl(220 90% 56% / 0.1);
     --shadow-elevated: 0 20px 40px -12px hsl(220 15% 10% / 0.15);
-    
+
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -93,9 +93,16 @@ All colors MUST be HSL.
     --gradient-mesh: radial-gradient(at 0% 0%, hsl(220 90% 56% / 0.2) 0px, transparent 50%),
                      radial-gradient(at 100% 0%, hsl(267 84% 65% / 0.2) 0px, transparent 50%),
                      radial-gradient(at 100% 100%, hsl(158 64% 52% / 0.15) 0px, transparent 50%);
-    
+
     --shadow-glass: 0 8px 32px 0 hsl(0 0% 0% / 0.3);
     --shadow-elevated: 0 20px 40px -12px hsl(0 0% 0% / 0.5);
+  }
+  .theme {
+    --animate-first: moveVertical 30s ease infinite;
+    --animate-second: moveInCircle 20s reverse infinite;
+    --animate-third: moveInCircle 40s linear infinite;
+    --animate-fourth: moveHorizontal 40s ease infinite;
+    --animate-fifth: moveInCircle 20s ease infinite;
   }
 }
 
@@ -118,5 +125,77 @@ All colors MUST be HSL.
     backdrop-filter: blur(12px);
     border: 1px solid hsl(var(--border) / 0.5);
     box-shadow: var(--shadow-glass);
+  }
+}
+
+/* ---break---
+*/
+
+@theme inline {
+  @keyframes moveHorizontal {
+  0% {
+    transform: translateX(-50%) translateY(-10%);
+    }
+  50% {
+    transform: translateX(50%) translateY(10%);
+    }
+  100% {
+    transform: translateX(-50%) translateY(-10%);
+    }
+  }
+  @keyframes moveInCircle {
+  0% {
+    transform: rotate(0deg);
+    }
+  50% {
+    transform: rotate(180deg);
+    }
+  100% {
+    transform: rotate(360deg);
+    }
+  }
+  @keyframes moveVertical {
+  0% {
+    transform: translateY(-50%);
+    }
+  50% {
+    transform: translateY(50%);
+    }
+  100% {
+    transform: translateY(-50%);
+    }
+  }
+  @keyframes moveHorizontal {
+  0% {
+    transform: translateX(-50%) translateY(-10%);
+    }
+  50% {
+    transform: translateX(50%) translateY(10%);
+    }
+  100% {
+    transform: translateX(-50%) translateY(-10%);
+    }
+  }
+  @keyframes moveInCircle {
+  0% {
+    transform: rotate(0deg);
+    }
+  50% {
+    transform: rotate(180deg);
+    }
+  100% {
+    transform: rotate(360deg);
+    }
+  }
+  @keyframes moveVertical {
+  0% {
+    transform: translateY(-50%);
+    }
+  50% {
+    transform: translateY(50%);
+    }
+  100% {
+    transform: translateY(-50%);
+    }
   }
 }
