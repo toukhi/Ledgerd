@@ -14,6 +14,8 @@ export interface CertificateMeta {
   category?: CertificateCategory;
   skills?: string[];
   evidenceUrls?: string[];
+  usefulLinks?: string[]; // optional list of helpful URLs (event page, LinkedIn, Luma, etc.)
+  attachments?: { name: string; type?: string; size: number }[]; // uploaded files metadata
   startDate?: string; // ISO
   endDate?: string;   // ISO
   image?: string;     // IPFS URL or generated data URL

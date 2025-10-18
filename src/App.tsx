@@ -8,10 +8,12 @@ import { WagmiProvider } from 'wagmi';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { config } from './lib/wagmi';
 import { Navigation } from './components/Navigation';
+import Chatbot from './components/Chatbot';
 import Home from "./pages/Home";
 import CertificateDetail from "./pages/CertificateDetail";
 import IssueCertificate from "./pages/IssueCertificate";
 import NotFound from "./pages/NotFound";
+import CreateFab from './components/CreateFab';
 import { sdk } from '@farcaster/miniapp-sdk';
 import { useEffect } from 'react';
 
@@ -35,6 +37,8 @@ function App() {
             <BrowserRouter>
               <div className="min-h-screen flex flex-col">
                 <Navigation />
+                <Chatbot />
+                <CreateFab />
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/cert/:id" element={<CertificateDetail />} />
