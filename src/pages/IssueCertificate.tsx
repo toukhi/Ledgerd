@@ -12,7 +12,7 @@ import { CertificateCategory, CertificateMeta } from '@/types/certificate';
 import { issueMockCertificate } from '@/lib/mockChain';
 import { useAppStore } from '@/store/useAppStore';
 import { toast } from 'sonner';
-import { ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, Send, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { isAddress } from 'viem';
 
@@ -32,9 +32,11 @@ export default function IssueCertificate() {
     category: '' as CertificateCategory,
     skills: '',
     evidenceUrls: '',
+    usefulLinks: [''],
     startDate: '',
     endDate: '',
     imageUrl: '',
+    attachments: [] as { name: string; type?: string; size: number }[],
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -66,6 +68,14 @@ export default function IssueCertificate() {
       }
     }
 
+    // validate usefulLinks array (optional)
+    if (formData.usefulLinks && Array.isArray(formData.usefulLinks)) {
+      const invalid = (formData.usefulLinks as string[]).filter(l => l && !l.startsWith('https://'));
+      if (invalid.length > 0) {
+        newErrors.usefulLinks = 'Useful links must be valid https:// URLs';
+      }
+    }
+
     if (formData.startDate && formData.endDate) {
       if (new Date(formData.startDate) > new Date(formData.endDate)) {
         newErrors.endDate = 'End date must be after start date';
@@ -91,6 +101,8 @@ export default function IssueCertificate() {
         category: formData.category || undefined,
         skills: formData.skills ? formData.skills.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         evidenceUrls: formData.evidenceUrls ? formData.evidenceUrls.split(',').map(u => u.trim()).filter(Boolean) : undefined,
+        usefulLinks: formData.usefulLinks ? (Array.isArray(formData.usefulLinks) ? formData.usefulLinks.map(u => u.trim()).filter(Boolean) : undefined) : undefined,
+        attachments: formData.attachments && formData.attachments.length > 0 ? formData.attachments : undefined,
         startDate: formData.startDate || undefined,
         endDate: formData.endDate || undefined,
         image: formData.imageUrl || undefined,
@@ -151,6 +163,44 @@ export default function IssueCertificate() {
             <Card className="glass-card p-6">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
+                  <Label htmlFor="attachments">Attachments (optional)</Label>
+                  <p className="text-xs text-muted-foreground">Upload any supporting files as PDF (handbook, brochure, etc.).</p>
+                  <div>
+                    <input
+                      id="attachments"
+                      type="file"
+                      multiple
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        const metas = files.map(f => ({ name: f.name, type: f.type, size: f.size }));
+                        setFormData(prev => ({ ...prev, attachments: [...prev.attachments, ...metas] }));
+                        // clear input so selecting same file again works
+                        (e.target as HTMLInputElement).value = '';
+                      }}
+                      className="hidden"
+                    />
+
+                    <label htmlFor="attachments" className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700">
+                      <Plus className="h-4 w-4" />
+                      <span>Upload files</span>
+                    </label>
+                  </div>
+
+                  {formData.attachments.length > 0 && (
+                    <div className="space-y-2 mt-2">
+                      {formData.attachments.map((a, i) => (
+                        <div key={i} className="flex items-center justify-between gap-2 bg-white/50 dark:bg-slate-900 px-3 py-2 rounded-md border border-slate-100 dark:border-slate-800">
+                          <div className="text-sm truncate">{a.name} <span className="text-xs text-muted-foreground">({Math.round(a.size/1024)} KB)</span></div>
+                          <Button variant="ghost" type="button" onClick={() => {
+                            const next = Array.from(formData.attachments);
+                            next.splice(i, 1);
+                            setFormData(prev => ({ ...prev, attachments: next }));
+                          }}>Remove</Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <Label htmlFor="recipient">Recipient Address *</Label>
                   <Input
                     id="recipient"
@@ -189,6 +239,45 @@ export default function IssueCertificate() {
                   />
                   {errors.issuerName && (
                     <p className="text-sm text-destructive">{errors.issuerName}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="usefulLinks">Useful Links (optional)</Label>
+                  <p className="text-xs text-muted-foreground">Add helpful links (event page, etc.). Must start with https://</p>
+                  <div className="space-y-2">
+                    {(formData.usefulLinks as string[]).map((link, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <Input
+                          placeholder="https://"
+                          value={link}
+                          onChange={(e) => {
+                            const next = Array.from(formData.usefulLinks as string[]);
+                            next[idx] = e.target.value;
+                            setFormData(prev => ({ ...prev, usefulLinks: next }));
+                            if (errors.usefulLinks) setErrors(prev => ({ ...prev, usefulLinks: '' }));
+                          }}
+                        />
+                        <Button type="button" variant="ghost" onClick={() => {
+                          const next = Array.from(formData.usefulLinks as string[]);
+                          next.splice(idx, 1);
+                          setFormData(prev => ({ ...prev, usefulLinks: next }));
+                        }}>
+                          Remove
+                        </Button>
+                      </div>
+                    ))}
+
+                    <Button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, usefulLinks: [...(prev.usefulLinks as string[]), ''] }))}
+                      className="bg-slate-100 dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-md px-3 py-2"
+                    >
+                      + Add link
+                    </Button>
+                  </div>
+                  {errors.usefulLinks && (
+                    <p className="text-sm text-destructive">{errors.usefulLinks}</p>
                   )}
                 </div>
 

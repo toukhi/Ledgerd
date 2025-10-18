@@ -56,7 +56,7 @@ export function Navigation() {
           <div className="flex items-center gap-3">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
+                <Button variant="ghost" size="icon" className="relative ml-3 md:ml-0">
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
                     <Badge 
@@ -81,10 +81,10 @@ export function Navigation() {
 
             <Link to="/issue">
               <Button
-                className="gap-2 bg-[#c7395c] text-white hover:bg-[#a9667e] border-none"
+                className="gap-2 bg-[#c7395c] text-white hover:bg-[#a9667e] border-none px-2 py-1 hidden md:flex"
               >
                 <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">Create</span>
+                <span className="ml-2">Create</span>
               </Button>
             </Link>
 
