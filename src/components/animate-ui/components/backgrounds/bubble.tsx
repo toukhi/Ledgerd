@@ -33,8 +33,8 @@ const BubbleBackground = React.forwardRef<HTMLDivElement, BubbleBackgroundProps>
       interactive = false,
       transition = { stiffness: 100, damping: 20 },
       colors = {
-        first: '207, 195, 227',
-        second: '152, 108, 224',
+        first: '207, 195, 227',   // Light purple
+        second: '152, 108, 224',  // Medium purple
         third: '207, 195, 227',
         fourth:  '152, 108, 224',
         fifth: '207, 195, 227',
@@ -122,14 +122,14 @@ const BubbleBackground = React.forwardRef<HTMLDivElement, BubbleBackgroundProps>
           <motion.div
             className="absolute rounded-full size-[80%] top-[10%] left-[10%] mix-blend-hard-light bg-[radial-gradient(circle_at_center,rgba(var(--first-color),0.8)_0%,rgba(var(--first-color),0)_50%)]"
             animate={{ y: [-50, 50, -50] }}
-            transition={{ duration: 30, ease: 'easeInOut', repeat: Infinity }}
+            transition={{ duration: 10, ease: 'easeInOut', repeat: Infinity }}
           />
 
           <motion.div
             className="absolute inset-0 flex justify-center items-center origin-[calc(50%-400px)]"
             animate={{ rotate: 360 }}
             transition={{
-              duration: 20,
+              duration: 7,
               ease: 'linear',
               repeat: Infinity,
               repeatType: 'loop',
@@ -141,7 +141,7 @@ const BubbleBackground = React.forwardRef<HTMLDivElement, BubbleBackgroundProps>
           <motion.div
             className="absolute inset-0 flex justify-center items-center origin-[calc(50%+400px)]"
             animate={{ rotate: 360 }}
-            transition={{ duration: 40, ease: 'linear', repeat: Infinity }}
+            transition={{ duration: 14, ease: 'linear', repeat: Infinity }}
           >
             <div className="absolute rounded-full size-[80%] bg-[radial-gradient(circle_at_center,rgba(var(--third-color),0.8)_0%,rgba(var(--third-color),0)_50%)] mix-blend-hard-light top-[calc(50%+200px)] left-[calc(50%-500px)]" />
           </motion.div>
@@ -149,13 +149,13 @@ const BubbleBackground = React.forwardRef<HTMLDivElement, BubbleBackgroundProps>
           <motion.div
             className="absolute rounded-full size-[80%] top-[10%] left-[10%] mix-blend-hard-light bg-[radial-gradient(circle_at_center,rgba(var(--fourth-color),0.8)_0%,rgba(var(--fourth-color),0)_50%)] opacity-70"
             animate={{ x: [-50, 50, -50] }}
-            transition={{ duration: 40, ease: 'easeInOut', repeat: Infinity }}
+            transition={{ duration: 13, ease: 'easeInOut', repeat: Infinity }}
           />
 
           <motion.div
             className="absolute inset-0 flex justify-center items-center origin-[calc(50%_-_800px)_calc(50%_+_200px)]"
             animate={{ rotate: 360 }}
-            transition={{ duration: 20, ease: 'linear', repeat: Infinity }}
+            transition={{ duration: 7, ease: 'linear', repeat: Infinity }}
           >
             <div className="absolute rounded-full size-[160%] mix-blend-hard-light bg-[radial-gradient(circle_at_center,rgba(var(--fifth-color),0.8)_0%,rgba(var(--fifth-color),0)_50%)] top-[calc(50%-80%)] left-[calc(50%-80%)]" />
           </motion.div>
