@@ -34,7 +34,7 @@ export function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">
-            <Link to="/" className="flex items-center gap-2 font-bold text-xl">
+            <Link to="/" className="flex items-center gap-1 font-bold text-xl">
               <img src={logoSmall} alt="Logo" className="h-8 w-8 rounded-lg" />
               <span className="text-3xl font-bold mb-0 bg-gradient-to-r from-[#c7395c] to-[#a9667e] bg-clip-text text-transparent">
                 Ledgerd
@@ -56,7 +56,7 @@ export function Navigation() {
           <div className="flex items-center gap-3">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative ml-3 md:ml-0">
+                <Button variant="ghost" size="icon" className="relative ml-10 md:ml-0">
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
                     <Badge 

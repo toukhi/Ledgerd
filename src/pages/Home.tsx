@@ -27,7 +27,7 @@ export default function Home() {
       <div className="min-h-[calc(100vh-4rem)] gradient-mesh">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[#c7395c] to-[#a9667e] bg-clip-text text-transparent">
               Your Certificates
             </h1>
             <p className="text-muted-foreground">
