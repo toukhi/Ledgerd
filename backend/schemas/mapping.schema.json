@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PDF to Certificate Mapping",
+  "description": "Schema for mapping extracted PDF text/layout to certificate fields with confidence and source pointers.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "title": { "$ref": "#/definitions/fieldString" },
+    "issuer": { "$ref": "#/definitions/fieldString" },
+    "usefulLinks": { "$ref": "#/definitions/fieldStringArray" },
+    "startDate": { "$ref": "#/definitions/fieldStringDate" },
+    "endDate": { "$ref": "#/definitions/fieldStringDate" },
+    "issuedDate": { "$ref": "#/definitions/fieldStringDate" },
+    "description": { "$ref": "#/definitions/fieldString" },
+    "skills": { "$ref": "#/definitions/fieldStringArray" },
+    "recipient": { "$ref": "#/definitions/fieldString" },
+    "recipientAddress": { "$ref": "#/definitions/fieldString" }
+  },
+  "definitions": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "page": { "type": "integer", "minimum": 1 },
+        "itemIndex": { "type": "integer", "minimum": 0 },
+        "bbox": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "x": { "type": "number" },
+            "y": { "type": "number" },
+            "w": { "type": "number" },
+            "h": { "type": "number" }
+          },
+          "required": ["x","y","w","h"]
+        },
+        "text": { "type": "string" }
+      },
+      "required": ["page","itemIndex"]
+    },
+    "baseField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "value": {},
+        "original": { "type": "string" },
+        "format": { "type": "string" },
+        "confidence": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "sources": { "type": "array", "items": { "$ref": "#/definitions/source" } }
+      },
+      "required": ["value","confidence"]
+    },
+    "fieldString": {
+      "allOf": [ { "$ref": "#/definitions/baseField" }, { "properties": { "value": { "type": "string" } }, "required": ["value"] } ]
+    },
+    "fieldStringArray": {
+      "allOf": [ { "$ref": "#/definitions/baseField" }, { "properties": { "value": { "type": "array", "items": { "type": "string" } } }, "required": ["value"] } ]
+    },
+    "fieldStringDate": {
+      "allOf": [ { "$ref": "#/definitions/baseField" }, { "properties": { "value": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$|^.*$" } }, "required": ["value"] } ]
+    }
+  }
+}
