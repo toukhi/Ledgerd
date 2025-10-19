@@ -56,7 +56,10 @@ export default function Chatbot() {
       <button
         aria-label={open ? "Close chat" : "Open chat"}
         onClick={() => setOpen((s) => !s)}
-        className="fixed z-50 right-6 bottom-6 w-14 h-14 rounded-full bg-gradient-to-br from-pink-500 to-indigo-500 shadow-lg flex items-center justify-center text-white ring-4 ring-white/20 hover:scale-105 transition-transform"
+className="fixed z-50 right-6 bottom-6 w-14 h-14 rounded-full 
+           bg-gradient-to-br from-[#c7395c] to-[#a9667e] 
+           shadow-lg flex items-center justify-center text-white 
+           ring-4 ring-white/20 hover:scale-105 transition-transform"
         title={open ? "Close chat" : "Open chat"}
       >
         {open ? (
@@ -75,7 +78,7 @@ export default function Chatbot() {
         <div className="fixed z-50 right-6 bottom-24 w-80 max-w-full bg-white/95 dark:bg-slate-900/95 rounded-xl shadow-2xl ring-1 ring-slate-900/5 overflow-hidden flex flex-col">
           <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-indigo-500 flex items-center justify-center text-white font-medium">L</div>
+              <img src="/logo-small.png" alt="Logo" className="h-6 w-6 rounded-lg" />
               <div className="text-sm font-medium">Ledgerd Chat</div>
             </div>
             <div className="text-xs text-slate-500">AI • Offline demo</div>
